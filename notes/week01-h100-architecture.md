@@ -109,6 +109,30 @@ my grid ─→ GigaThread Engine ─→ each block goes to one SM
 
 ---
 
+### 1c. What is a GPC, and why does it exist?
+
+A **GPC** (Graphics Processing Cluster) is a neighbourhood of SMs on the chip.
+
+```
+chip ─→ 8 GPCs ─→ each has ~8–9 TPCs ─→ each TPC has 2 SMs
+```
+
+- The full GH100 design is 8 GPCs × 9 TPCs × 2 SMs = **144 SMs**. My H100 SXM has **132** enabled. Chips are never perfect, so NVIDIA switches off a few SMs that have defects (this is called *yield*). As a result, my GPCs don't all have the same number of SMs.
+- **Normally I don't care about GPCs.** My blocks are spread over all SMs, and I can't choose where they go.
+- **Why it matters on H100: clusters.** I can ask for a group of blocks (a *cluster*, up to 8, or 16 with opt-in) to be placed **inside one GPC at the same time**. SMs in one GPC are wired together, so blocks in a cluster can read each other's shared memory. Without clusters, blocks can't share at all (Week 12).
+
+```
+┌──────────────── one GPC ────────────────┐
+│  [SM]  [SM]  [SM]  [SM]  [SM]  [SM] ... │
+│   ↑      ↑     ↑     ↑                  │
+│  blk0  blk1  blk2  blk3   ← one cluster │
+│   └──────┴─────┴─────┘                  │
+│   can read each other's shared memory   │
+└─────────────────────────────────────────┘
+```
+
+---
+
 ### 2. What do I control?
 
 I write code for **one thread**. Then I group threads:
@@ -133,6 +157,37 @@ if (i < n) c[i] = a[i] + b[i];
 - Each block has its **own** shared memory. Two blocks on the same SM still cannot see each other's.
 
 Teams and workshops: one workshop hosts several teams, and each team has its own whiteboard.
+
+---
+
+### 3b. How does a block get its shared memory?
+
+I declare it in the kernel:
+
+```cpp
+__global__ void k(...) {
+    __shared__ float tile[256];   // 256 × 4 B = 1 KB
+    ...
+}
+```
+
+This line does **not** create one array for the whole GPU. **Every block gets its own private copy** of `tile`.
+
+```
+SM 0's shared memory (228 KB)
+┌────────────┬────────────┬────────────┬──────────────────┐
+│ block 0's  │ block 3's  │ block 6's  │      free        │
+│ tile (1KB) │ tile (1KB) │ tile (1KB) │                  │
+└────────────┴────────────┴────────────┴──────────────────┘
+```
+
+- **When it's given:** at the moment the block starts on an SM, a slice is carved out of that SM's 228 KB.
+- **When it's freed:** when the block finishes. The next block can then use that space.
+- **Who sees it:** only threads of that block. Block 3 can't read block 0's `tile`, even on the same SM.
+- **It starts as garbage.** The threads must fill it (usually from HBM) and then call `__syncthreads()` before reading it.
+- **It limits how many blocks fit.** With 100 KB per block, only 228 ÷ 100 = **2 blocks** fit on an SM, even if threads and registers would allow more.
+- **Size limits per block:** 48 KB by default; up to 227 KB if I opt in (my GPU reports `shared_memory_per_block_optin = 232448` bytes).
+- The size can also be set at launch time (*dynamic* shared memory): `k<<<grid, block, bytes>>>(...)`, with `extern __shared__ float tile[];` in the kernel.
 
 ---
 
