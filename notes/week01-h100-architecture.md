@@ -64,5 +64,13 @@ Example: n = 2²⁴, B = 256 → 65,536 blocks; 8 resident blocks/SM → 1,056 a
 - Divergence costs at **warp** level: lanes of one warp taking different branches serialize; whole warps taking different branches cost nothing extra.
 - I write code for one thread; hardware groups threads into warps, places blocks on SMs, and runs thousands concurrently.
 
+## Corrected misconceptions (Session 1 quiz)
+- **A block is never split across SMs.** It runs entirely on one SM — required for shared memory and `__syncthreads()`.
+- **One SM holds many blocks**, not the reverse: 2048 threads/SM → 8 blocks of 256, or 2 blocks of 1024 (thread limit; registers/shared memory can lower it).
+- A warp = 32 **threads** (tickets), not 32 workers. Lanes (cores) execute the warp's instruction.
+- `if (i < n)` exists because the grid has more threads than elements (n=1000, B=256 → 1024 threads); the extra 24 would access out of bounds.
+- Divergence is **inside a warp**: `threadIdx.x % 2` diverges; `(threadIdx.x / 32) % 2` does not.
+- Shared memory is **per block**, even for two blocks on the same SM. Blocks communicate only via global memory (atomics or separate launches).
+
 ## Open doubts
 - (add here)
