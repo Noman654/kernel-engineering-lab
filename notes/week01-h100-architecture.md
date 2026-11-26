@@ -18,6 +18,97 @@ Inside one SM:
 
 ---
 
+### 1b. What's inside the H100, drawn from the outside in
+
+**Level 1: the whole chip**
+
+```
+┌──────────────────────────── H100 SXM chip ────────────────────────────┐
+│                                                                        │
+│   GigaThread Engine  ← hands out my blocks to SMs                      │
+│                                                                        │
+│  ┌─ GPC 0 ─┐ ┌─ GPC 1 ─┐ ┌─ GPC 2 ─┐ ┌─ GPC 3 ─┐                       │
+│  │ ~16 SMs │ │ ~16 SMs │ │ ~16 SMs │ │ ~16 SMs │                       │
+│  └─────────┘ └─────────┘ └─────────┘ └─────────┘                       │
+│  ┌──────────────── L2 cache 50 MB (shared by all SMs) ──────────────┐  │
+│  └──────────────────────────────────────────────────────────────────┘  │
+│  ┌─ GPC 4 ─┐ ┌─ GPC 5 ─┐ ┌─ GPC 6 ─┐ ┌─ GPC 7 ─┐                       │
+│  │ ~16 SMs │ │ ~16 SMs │ │ ~16 SMs │ │ ~16 SMs │    8 GPCs = 132 SMs   │
+│  └─────────┘ └─────────┘ └─────────┘ └─────────┘                       │
+│                                                                        │
+│  Memory controllers ──────────────────────────────── NVLink / PCIe    │
+└──────┬─────────┬─────────┬─────────┬─────────┬─────────────────────────┘
+   ┌───┴──┐  ┌───┴──┐  ┌───┴──┐  ┌───┴──┐  ┌───┴──┐
+   │ HBM3 │  │ HBM3 │  │ HBM3 │  │ HBM3 │  │ HBM3 │   5 stacks = 80 GB
+   │ 16 GB│  │ 16 GB│  │ 16 GB│  │ 16 GB│  │ 16 GB│   ~3.35 TB/s total
+   └──────┘  └──────┘  └──────┘  └──────┘  └──────┘
+```
+
+- **GPC** (Graphics Processing Cluster): a group of SMs. Matters later for clusters (Week 12).
+- **HBM** stacks sit *beside* the chip in the same package, not inside it. That's why going there is slow.
+
+**Level 2: one GPC**
+
+```
+┌──────────────── GPC ────────────────┐
+│ ┌─ TPC ──────┐  ┌─ TPC ──────┐       │
+│ │ [SM] [SM]  │  │ [SM] [SM]  │  ...  │   TPC = 2 SMs
+│ └────────────┘  └────────────┘       │   ~8–9 TPCs per GPC
+└──────────────────────────────────────┘
+```
+
+**Level 3: one SM** (132 of these)
+
+```
+┌──────────────────────────────── SM ────────────────────────────────┐
+│                       L1 instruction cache                          │
+│ ┌─ Sub-part 0 ─┐ ┌─ Sub-part 1 ─┐ ┌─ Sub-part 2 ─┐ ┌─ Sub-part 3 ─┐ │
+│ │  (see below) │ │  (see below) │ │  (see below) │ │  (see below) │ │
+│ └──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘ │
+│                                                                     │
+│ ┌──────── L1 data cache + Shared memory: 256 KB together ────────┐ │
+│ │   shared memory (I control, per block) │ L1 (hardware cache)    │ │
+│ └─────────────────────────────────────────────────────────────────┘ │
+│   TMA (bulk copy engine, Week 12)          Texture units            │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**Level 4: one sub-partition** (4 per SM, this is where warps actually run)
+
+```
+┌────────────────── Sub-partition ──────────────────┐
+│ L0 instruction cache                               │
+│ Warp scheduler   → picks 1 ready warp per cycle    │
+│ Dispatch unit    → sends its instruction to lanes  │
+│                                                    │
+│ Register file: 16,384 registers (64 KB)            │
+│                                                    │
+│ ┌────────────────────────────────────────────────┐ │
+│ │ FP32 × 32   ← the "32 cores" (one warp wide)   │ │
+│ │ INT32 × 16                                     │ │
+│ │ FP64 × 16                                      │ │
+│ │ Tensor core × 1  (matrix math, Week 8)         │ │
+│ │ LD/ST × 8   (load/store to memory)             │ │
+│ │ SFU × 4     (exp, sin, sqrt)                   │ │
+│ └────────────────────────────────────────────────┘ │
+└────────────────────────────────────────────────────┘
+```
+
+**Check the numbers add up:**
+- 4 sub-partitions × 32 FP32 = **128 cores per SM**
+- 4 sub-partitions × 16,384 = **65,536 registers per SM**
+- 4 schedulers × 1 warp per cycle = **4 warps running per cycle**
+- 132 SMs × 128 = **16,896 FP32 cores on the chip**
+
+**Where my code lands:**
+```
+my grid ─→ GigaThread Engine ─→ each block goes to one SM
+                                   └─→ its warps are split across the 4 sub-partitions
+                                          └─→ each cycle, a scheduler runs one warp on its 32 FP32 lanes
+```
+
+---
+
 ### 2. What do I control?
 
 I write code for **one thread**. Then I group threads:
