@@ -23,6 +23,7 @@ echo "Session $n — $today ($kind)"
 ask "Did (one topic)"                          did 1
 ask "Result (prediction vs reality)"           result 1
 ask "Evidence (numbers / test / file)"         evidence 0
+ask "Learned (concepts, comma-separated)"      learned 1
 ask "Lesson (in my control? attention leak?)"  lesson 0
 ask "Next (tomorrow's FIRST action)"           next 1
 
@@ -32,6 +33,7 @@ cat >> worklog.md <<EOF
 - **Did:** $did
 - **Result:** $result
 - **Evidence:** ${evidence:--}
+- **Learned:** $learned
 - **Lesson:** ${lesson:--}
 - **Next:** $next
 EOF
@@ -48,6 +50,7 @@ Plan reference: [PLAN.md](PLAN.md). When done: \`./log.sh\`
 EOF
 
 sed -i -E "s|^(Sessions logged: \*\*)[0-9]+|\1$n|" README.md
+echo "Reminder: update LEARNED.md statuses (🟡 learned → 🟢 practised → ✅ closed-book)."
 
 git add -A
 git commit -q -m "Session $n ($today): $did"

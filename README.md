@@ -16,6 +16,7 @@ Sessions logged: **1** / 90 (target ≥ 80)
 | [NEXT.md](NEXT.md) | Today's first action. Open it and start. |
 | [PLAN.md](PLAN.md) | The locked 15-week roadmap. |
 | [RULEBOOK.md](RULEBOOK.md) | Philosophy, habit rules, engineering rules, AI rules. |
+| [LEARNED.md](LEARNED.md) | Every concept learned, its status, mistakes made, open questions. |
 | [worklog.md](worklog.md) | One entry per session + Saturday reviews. |
 | [unresolved-questions.md](unresolved-questions.md) | Parking lot and important-problems list. |
 | `benchmarks/` | `benchmark.py` harness; `results.csv` auto-records environment + timings. |

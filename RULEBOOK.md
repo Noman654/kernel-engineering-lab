@@ -68,6 +68,7 @@ practise (or fail to practise) the code this week?*
 6. **Rest is planned, not missed.** Measure *weekly consistency*, not streaks.
 7. **Fall behind → shift right.** Never compress or cram.
 8. **The destination is locked for 15 weeks.** Only the next task adapts.
+9. **Track what I learn.** End of every session: `./log.sh` (includes *Learned*), add the session's questions to `notes/`, update statuses in `LEARNED.md`, tick `PLAN.md`.
 
 ### The 60-minute session
 
