@@ -109,37 +109,11 @@ my grid ─→ GigaThread Engine ─→ each block goes to one SM
 
 ---
 
-### 1c. What is a GPC, and why does it exist?
+### 1c. What is a GPC? (not needed yet)
 
-A **GPC** (Graphics Processing Cluster) is a neighbourhood of SMs on the chip.
-
-```
-chip ─→ 8 GPCs ─→ each has ~8–9 TPCs ─→ each TPC has 2 SMs
-```
-
-- The full GH100 design is 8 GPCs × 9 TPCs × 2 SMs = **144 SMs**. My H100 SXM has **132** enabled. Chips are never perfect, so NVIDIA switches off a few SMs that have defects (this is called *yield*). As a result, my GPCs don't all have the same number of SMs.
-**Why have GPC and TPC at all? Why not just 132 SMs in a row?**
-
-1. **The chip is too big to wire flat.** The H100 is about 814 mm² with 80 billion transistors. If every SM were wired directly to everything, the wires would be long, slow, and power-hungry. So the chip is built like a city: SMs sit in pairs (TPC), pairs form neighbourhoods (GPC), and neighbourhoods connect to the shared L2 and HBM. Nearby things are wired closely; far things go through shared roads.
-2. **Design once, copy many times.** Engineers design one TPC, copy it to build a GPC, then copy the GPC 8 times. That's how you build an 80-billion-transistor chip without designing every piece by hand.
-3. **Yield.** Some SMs always come out broken. Because of the grouping, NVIDIA can switch off a broken TPC and still sell the chip. The same design ships as different products: H100 SXM has 132 SMs, H100 PCIe has 114.
-4. **Shared hardware.** The names come from graphics. Each **G**raphics **P**rocessing **C**luster has its own raster engine for drawing triangles, and each **T**exture **P**rocessing **C**luster pair shares some graphics hardware. For compute (my kernels), the useful part is that SMs in one GPC are wired together, which is what makes clusters possible.
-5. **Simpler work distribution.** The GigaThread engine hands blocks to GPCs, and GPCs hand them to SMs. Two small steps are easier to build in hardware than one giant one.
-
-So: **TPC and GPC exist for building and wiring the chip. As a kernel writer I mostly only see the SM, except when I use clusters.**
-
-- **Normally I don't care about GPCs.** My blocks are spread over all SMs, and I can't choose where they go.
-- **Why it matters on H100: clusters.** I can ask for a group of blocks (a *cluster*, up to 8, or 16 with opt-in) to be placed **inside one GPC at the same time**. SMs in one GPC are wired together, so blocks in a cluster can read each other's shared memory. Without clusters, blocks can't share at all (Week 12).
-
-```
-┌──────────────── one GPC ────────────────┐
-│  [SM]  [SM]  [SM]  [SM]  [SM]  [SM] ... │
-│   ↑      ↑     ↑     ↑                  │
-│  blk0  blk1  blk2  blk3   ← one cluster │
-│   └──────┴─────┴─────┘                  │
-│   can read each other's shared memory   │
-└─────────────────────────────────────────┘
-```
+- Chip → 8 **GPCs** → TPCs → 2 SMs each. Only 132 of 144 SMs are enabled; defective ones are switched off.
+- They exist for building and wiring the chip. As a kernel writer I only see SMs.
+- Comes back in **Week 12**: a *cluster* of blocks placed in one GPC can share shared memory.
 
 ---
 
