@@ -103,6 +103,30 @@ Resident warps / 64 = **occupancy** (Week 2).
 - Core trick of kernel engineering: **load from HBM once, reuse many times from shared memory/registers.**
 - Vector add reuses nothing → HBM-bandwidth-bound → my baseline 2743 GB/s.
 
+## Subtle points (easy to miss)
+
+**Warps**
+- Warps are formed from consecutive threads: lane = `threadIdx.x % 32`, warp = `threadIdx.x / 32`. In 2-D blocks, x varies fastest, then y.
+- Threads in a warp each have their own program counter (Volta+). Don't assume lockstep; use `__syncwarp()` when lanes exchange data.
+
+**Launch shape**
+- Blocks and grids can be 1-D, 2-D, or 3-D (`dim3`). Block: ≤ 1024 threads total (x, y ≤ 1024, z ≤ 64). Grid: x ≤ 2³¹−1, y and z ≤ 65,535.
+- For huge n, compute the index in 64-bit: `size_t i = (size_t)blockIdx.x * blockDim.x + threadIdx.x;` (int overflows past ~2.1 B).
+
+**Synchronization**
+- `__syncthreads()` syncs one block only. There is no barrier across blocks inside a normal kernel; the kernel boundary is the global sync.
+- Kernel launches are asynchronous: the CPU continues immediately. Time with CUDA events plus sync; check errors with `cudaGetLastError()` after the launch.
+
+**Registers**
+- Max 255 registers per thread. If a kernel needs more, the compiler **spills** to "local memory", which physically lives in HBM (cached in L1/L2), so spills are slow. Check with `nvcc --resource-usage`.
+
+**Hopper-specific exception**
+- H100 adds **thread block clusters**: up to 8 blocks (16 opt-in) scheduled together on one GPC that **can** read each other's shared memory (distributed shared memory). The "shared memory is per block" rule is exact only without clusters (Week 12).
+- SMs are grouped: 2 SMs per TPC, ~16–18 SMs per GPC. Clusters are placed within one GPC.
+
+**Tail effect**
+- If blocks ÷ (132 × blocks per SM) leaves a partial last wave, some SMs sit idle at the end. It matters for small grids.
+
 ## Corrected misconceptions (Session 1 quiz)
 - **A block is never split across SMs.** It runs entirely on one SM — required for shared memory and `__syncthreads()`.
 - **One SM holds many blocks**, not the reverse: 2048 threads/SM → 8 blocks of 256, or 2 blocks of 1024 (thread limit; registers/shared memory can lower it).
