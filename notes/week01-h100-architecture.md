@@ -76,6 +76,18 @@ Example: n = 2²⁴, B = 256 → 65,536 blocks; 8 resident blocks/SM → 1,056 a
 - More registers per thread → fewer resident threads (64 regs → 1024 threads). That is **occupancy**.
 - One line: 128 compute, up to 2048 wait their turn, so cores never sit idle while data travels.
 
+## Where does 2048 come from?
+
+Hardware bookkeeping: each resident warp needs a **scheduler slot** (PC + ready/waiting status) and its **registers**.
+H100: 4 schedulers × 16 warp slots = 64 warps × 32 = **2048 threads**. Register file 65,536 / 2048 = 32 regs/thread.
+Queried on my GPU: `max_threads_per_multi_processor = 2048`, `regs_per_multiprocessor = 65536`, `shared_memory_per_multiprocessor = 233472` (228 KB).
+
+Blocks per SM = **minimum** of: threads (2048), blocks (32), registers (65,536), shared memory (228 KB).
+- 256-thread blocks, 32 regs → 8 blocks (thread-limited)
+- 256-thread blocks, 64 regs → 4 blocks (register-limited)
+- 100 KB shared/block → 2 blocks (shared-memory-limited)
+Resident warps / 64 = **occupancy** (Week 2).
+
 ## Memory hierarchy (close/fast → far/slow)
 
 | Level | Where | Visible to | Controlled by | ~Latency |

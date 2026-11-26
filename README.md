@@ -25,7 +25,8 @@ Sessions logged: **0** / 90 (target ≥ 80)
 ## Daily loop
 
 ```
-ssh ip-10-0-132-247 && cd ~/kernel-engineering-lab && source env.sh
+ssh ip-10-0-132-247
+cd /home/mohd.nauman/kernel-engineering-lab && source env.sh   # note: ~ is /fsx2 on the GPU node
 open NEXT.md → do the one task → run/measure → ./log.sh
 ```
 
