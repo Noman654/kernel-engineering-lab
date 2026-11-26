@@ -13,14 +13,14 @@ philosophy → weekly review in `worklog.md`.
 ---
 
 ## Week 0 — Setup (3 sessions)
-- [ ] S1 🔧 Confirm approved GPU. Record `nvidia-smi`, `nvcc --version`, torch/triton versions.
-- [ ] S2 🔧 Verify `compute-sanitizer`, `nsys`, `ncu` all run (cloud instances often block counters). Run `python benchmarks/benchmark.py` smoke test.
-- [ ] S3 🔧 Push repo to GitHub. Pick the fixed daily slot. Do one practice `./log.sh`.
+- [x] S1 🔧 Confirm approved GPU. Record `nvidia-smi`, `nvcc --version`, torch/triton versions.
+- [x] S2 🔧 Verify `compute-sanitizer`, `nsys`, `ncu` all run (cloud instances often block counters). Run `python benchmarks/benchmark.py` smoke test.
+- [x] S3 🔧 Push repo to GitHub. Pick the fixed daily slot. Do one practice `./log.sh`.
 
 ## Week 1 — Performance thinking & CUDA execution model
 - [x] Mon 📖 Roofline (already known — skipped). Arithmetic intensity of vector add and GEMM by hand.
-- [ ] Tue 📖 Grids, blocks, threads, warps, SMs, SIMT, warp divergence. Draw a 1-D launch.
-- [ ] Wed 🔧 Vector-add kernel with bounds check; compare vs PyTorch; run `compute-sanitizer`.
+- [x] Tue 📖 Grids, blocks, threads, warps, SMs, SIMT, warp divergence. Draw a 1-D launch.
+- [x] Wed 🔧 Vector-add kernel with bounds check; compare vs PyTorch; run `compute-sanitizer`.
 - [ ] Thu 📖 CUDA C++ → PTX → SASS. Inspect output for vector add.
 - [ ] Fri 🧪 Benchmark vector add with the harness; compute achieved bandwidth vs peak.
 - [ ] Sat Review. Deliverable: roofline sheet, execution-model diagram, vector-add baseline.
