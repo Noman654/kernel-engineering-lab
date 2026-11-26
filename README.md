@@ -25,12 +25,16 @@ Sessions logged: **0** / 90 (target ≥ 80)
 ## Daily loop
 
 ```
+ssh ip-10-0-132-247 && cd ~/kernel-engineering-lab && source env.sh
 open NEXT.md → do the one task → run/measure → ./log.sh
 ```
 
 `./log.sh` asks five short questions, appends the worklog entry, writes tomorrow's
 `NEXT.md`, updates the session count, commits, and pushes.
 Use `./log.sh min` for a 15-minute minimum session.
+
+**Hardware:** NVIDIA H100 80GB HBM3 (sm_90), driver 580.95.05, CUDA 13.0, torch 2.13 (cu130), Triton 3.7.1.
+First baseline: torch vector add, 2^24 fp32, cold L2 → 2743 GB/s (~82% of HBM3 peak).
 
 ## Benchmarking
 
