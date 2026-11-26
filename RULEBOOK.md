@@ -71,12 +71,14 @@ practise (or fail to practise) the code this week?*
 
 ### The 60-minute session
 
+**Order is fixed: Learn → Practice → Questions.** Never questions before the topic is taught.
+If I already know the topic, say so — it is skipped and we move to the next one.
+
 | Time | Slot | Pillar | What to do |
 |---|---|---|---|
-| 10 min | **Understand** | Aristotle | One concept. Write the question it answers. |
-| 15 min | **Investigate** | Socrates | Read docs / paper / code / profiler. Ask: *Why does this work? What am I assuming? What would prove me wrong?* |
-| 25 min | **Build** | Aristotle | Code, run, measure. Predict the result *before* running. |
-| 10 min | **Reflect** | Epictetus | `./log.sh` — did / result / evidence / lesson (what was in my control, where attention leaked) / next. |
+| 20 min | **Learn** | Aristotle | AI teaches the topic directly and clearly: concept, numbers, diagrams, examples. No quizzing yet. |
+| 30 min | **Practice** | Aristotle | Code, run, measure. Predict the result *before* running. |
+| 10 min | **Questions + log** | Socrates / Epictetus | AI asks a few questions on what was learned and practised. Then `./log.sh`. |
 
 ### Weekly rhythm
 
@@ -114,13 +116,13 @@ first attempt is where learning happens.
 
 | Phase | AI role | Allowed | Not allowed |
 |---|---|---|---|
-| Weeks 1–5 (basics) | **Tutor** | Explain, ask Socratic questions, quiz me, write harness/plot boilerplate | Writing kernel code |
+| Weeks 1–5 (basics) | **Teacher** | Teach the topic directly first, then set the practice, then quiz at the end; write harness/plot boilerplate | Writing kernel code; quizzing before teaching |
 | Weeks 6–10 | **Reviewer** | Review my code for bugs, generate adversarial tests, help interpret profiler output (I verify) | Rewriting my code |
 | Weeks 11–15 | **Accelerator** | Generate variants, scaffold experiments, draft docs | Having the final word — the harness decides |
 
 ### Standard prompts
 
-1. **Tutor:** "Explain X. Don't give me the answer — ask me questions until I derive it."
+1. **Teacher:** "Teach me X clearly and directly. Then give me practice. Questions at the end."
 2. **Predict:** "Here is my kernel and GPU. Quiz me on the expected bottleneck before I run it."
 3. **Reviewer:** "Find correctness bugs, races, and untested edge cases. Don't rewrite. List issues only."
 4. **Examiner (Sat):** "Quiz me closed-book on this week's concepts. Grade harshly."

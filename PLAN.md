@@ -18,7 +18,7 @@ philosophy → weekly review in `worklog.md`.
 - [ ] S3 🔧 Push repo to GitHub. Pick the fixed daily slot. Do one practice `./log.sh`.
 
 ## Week 1 — Performance thinking & CUDA execution model
-- [ ] Mon 📖 Roofline. Arithmetic intensity of vector add and GEMM by hand.
+- [x] Mon 📖 Roofline (already known — skipped). Arithmetic intensity of vector add and GEMM by hand.
 - [ ] Tue 📖 Grids, blocks, threads, warps, SMs, SIMT, warp divergence. Draw a 1-D launch.
 - [ ] Wed 🔧 Vector-add kernel with bounds check; compare vs PyTorch; run `compute-sanitizer`.
 - [ ] Thu 📖 CUDA C++ → PTX → SASS. Inspect output for vector add.
