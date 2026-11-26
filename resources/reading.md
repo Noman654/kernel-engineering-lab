@@ -12,6 +12,8 @@ Read only what the current week in `PLAN.md` calls for.
 - Background on deliberate practice (with critique): https://pmc.ncbi.nlm.nih.gov/articles/PMC7461852
 
 ## Foundations & CUDA
+- Hwu, Kirk, El Hajj — *Programming Massively Parallel Processors* (PMPP, 4th ed.) — spine text for Weeks 1–6
+- GPU MODE lecture series + Discord — lectures map onto these weeks; humans to check understanding against
 - NVIDIA CUDA C++ Programming Guide; CUDA C++ Best Practices Guide
 - Williams, Waterman, Patterson — *Roofline: An Insightful Visual Performance Model*
 - Sasha Rush — GPU Puzzles
@@ -21,6 +23,8 @@ Read only what the current week in `PLAN.md` calls for.
 - Nsight Systems / Nsight Compute documentation; Compute Sanitizer documentation
 
 ## Triton, CUTLASS, CuTe
+- Colfax Research tutorials — TMA, WGMMA, CuTe layouts, FA3, Blackwell GEMM (Week 12)
+- CUTLASS 4.x CuTe Python DSL examples (chosen deep path for Week 12)
 - Official Triton tutorials; Triton Puzzles; Gluon tutorials
 - NVIDIA CUTLASS / CuTe documentation
 

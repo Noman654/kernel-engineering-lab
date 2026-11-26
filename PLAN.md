@@ -54,7 +54,7 @@ philosophy → weekly review in `worklog.md`.
 - [ ] Tue ⭐🔧 2-D register tiling; track accumulator/register footprint.
 - [ ] Wed 🔧 Vectorized `float4` loads; verify in SASS; alignment + tails.
 - [ ] Thu 📖 Warp tiling: map lanes/warps → output fragments.
-- [ ] Fri 🧪 Bounded sweep of BM/BN/BK/threads, one family at a time; write the worklog.
+- [ ] Fri 🧪 Bounded sweep of BM/BN/BK/threads, one family at a time; note wave quantization (odd M/N); write the worklog.
 - [ ] Sat Review. Deliverable: GEMM kernel sequence + reproducible worklog.
 
 ## Week 6 — Profiling, debugging, trustworthy benchmarks
@@ -70,7 +70,7 @@ philosophy → weekly review in `worklog.md`.
 - [ ] Tue 🔧 Fused softmax; block size effect. Compare with your Week 3 CUDA version.
 - [ ] Wed ⭐🔧 Matmul tutorial; explain its tiling and grouped ordering.
 - [ ] Thu 🧪 Autotuning: `num_warps`, `num_stages`, tile sizes (small search space).
-- [ ] Fri 🔧 One fused op (bias + GELU) vs eager PyTorch; register it via `torch.library`.
+- [ ] Fri 🔧 One fused op (bias + GELU) vs eager **and `torch.compile`**; register it via `torch.library`.
 - [ ] Sat Review. Deliverable: 4 Triton kernels with tests + benchmarks.
 
 ## Week 8 — Tensor cores & numerical formats
@@ -86,15 +86,15 @@ philosophy → weekly review in `worklog.md`.
 - [ ] Tue 📖 Memory cost of materializing scores across sequence lengths.
 - [ ] Wed 🔧 Stable softmax; adversarial logits.
 - [ ] Thu 🔧 Derive + implement online softmax (running max, sum, rescale).
-- [ ] Fri 🔧 Tiled attention reference (Q/K/V blocks, causal mask); validate; draw dataflow.
+- [ ] Fri 🔧 Tiled attention reference (Q/K/V blocks, causal mask); validate vs FP64 reference incl. fully-masked row (no NaN), seq len 1, non-block-multiple lengths; draw dataflow.
 - [ ] Sat Review. Deliverable: online-softmax reference + dataflow diagram.
 
 ## Week 10 — Attention II: FlashAttention
 - [ ] Mon 📖 FlashAttention paper: IO complexity, SRAM/HBM traffic.
 - [ ] Tue 📖 Forward pass → annotated pseudocode.
 - [ ] Wed ⭐🔧 Triton FA forward, non-causal.
-- [ ] Thu ⭐🔧 Add causal masking; full correctness tests.
-- [ ] Fri 🧪 FA2 reading (work partitioning) + benchmark vs PyTorch SDPA across seq lens / head dims.
+- [ ] Thu ⭐🔧 Add causal masking; full correctness tests (head_dim 64/80/96/128).
+- [ ] Fri 🧪 FA2 reading (work partitioning) + benchmark vs PyTorch SDPA (**pin the backend** with `sdpa_kernel`) and FlexAttention across seq lens / head dims.
 - [ ] Sat Review. Deliverable: correct FA prototype + FA1→FA2 note.
 
 ## Week 11 — Inference-serving kernels
@@ -106,8 +106,8 @@ philosophy → weekly review in `worklog.md`.
 - [ ] Sat Review. **Start looking for one small open-source issue to contribute to.**
 
 ## Week 12 — Frontier literacy & AI-generated kernels (light, reading-heavy)
-- [ ] Mon 📖 Hopper: TMA, WGMMA, async pipelines, warp specialization; FA3.
-- [ ] Tue 📖 CUTLASS/CuTe: trace one GEMM (gmem → smem → MMA → store).
+- [ ] Mon 🔧📖 `cp.async` double-buffering experiment (bridge from Week 4 tiling), then Hopper: TMA, WGMMA, async pipelines, warp specialization; FA3.
+- [ ] Tue 📖 CuTe **Python DSL** (one deep path, not Gluon too): trace one GEMM (gmem → smem → MMA → store); verify whether FA4 lives in `flash_attn/cute`.
 - [ ] Wed 🔧 Blackwell (tcgen05, TMEM) overview + NVFP4 quantize/dequantize reference; measure error.
 - [ ] Thu 📖 KernelBench paper + harness; skim DeepGEMM or FlashMLA kernel path.
 - [ ] Fri 🧪 Ask an LLM to optimize a known kernel; red-team it (shapes, strides, dtypes, tolerances, shortcuts).
@@ -121,7 +121,7 @@ philosophy → weekly review in `worklog.md`.
 - **Benchmark:** both against the unfused PyTorch pipeline, for a fixed model shape (e.g., hidden 4096, head_dim 128).
 
 ### Week 13 — Define & build A
-- [ ] Mon Freeze scope: GPU, shapes, dtypes, layouts, baseline, metric → `capstone/README.md`.
+- [ ] Mon Freeze scope: GPU, shapes, dtypes, layouts, **RoPE convention** (half-split vs interleaved, position offsets), FP8 scaling (per-token / per-128-group, consumed by `torch._scaled_mm`), baselines (**eager + `torch.compile`**), metric → `capstone/README.md`.
 - [ ] Tue Trusted references + full test matrix for A and B.
 - [ ] Wed Simplest correct Kernel A (Triton or CUDA). No tuning.
 - [ ] Thu Expand tests; sanitizer; fix every correctness issue.
@@ -141,7 +141,7 @@ philosophy → weekly review in `worklog.md`.
 - [ ] Tue Bounded tuning matrix for A and B.
 - [ ] Wed Full correctness suite; confirm no lucky-input specialization.
 - [ ] Thu Measure in a representative layer micro-workload; report kernel vs end-to-end separately.
-- [ ] Fri Publish: README, source, tests, scripts, profiler evidence, worklog, what didn't work.
+- [ ] Fri Publish: README, source, tests, scripts, profiler evidence, worklog, what didn't work. **Reproducibility test:** a fresh clone runs the README end-to-end in ≤ 30 min.
 - [ ] Sat Final review. Write the next 15-week plan.
 
 ---
