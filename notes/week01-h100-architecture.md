@@ -64,6 +64,18 @@ Example: n = 2²⁴, B = 256 → 65,536 blocks; 8 resident blocks/SM → 1,056 a
 - Divergence costs at **warp** level: lanes of one warp taking different branches serialize; whole warps taking different branches cost nothing extra.
 - I write code for one thread; hardware groups threads into warps, places blocks on SMs, and runs thousands concurrently.
 
+## Resident vs executing (why 2048 threads but only 128 cores?)
+
+| | Per SM | Meaning |
+|---|---|---|
+| Executing per cycle | 4 warps = 128 threads | 4 schedulers × 1 warp each × 32 lanes |
+| Resident | ≤ 64 warps = 2048 threads | loaded, registers kept on-chip, waiting their turn |
+
+- Most resident warps are waiting on HBM (~500 cycles). Each cycle a scheduler issues from a warp that is **ready**.
+- Switching warps costs **0 cycles**: every resident thread's registers stay on the SM (65,536 regs / 2048 threads = 32 each). No save/restore like a CPU.
+- More registers per thread → fewer resident threads (64 regs → 1024 threads). That is **occupancy**.
+- One line: 128 compute, up to 2048 wait their turn, so cores never sit idle while data travels.
+
 ## Memory hierarchy (close/fast → far/slow)
 
 | Level | Where | Visible to | Controlled by | ~Latency |
