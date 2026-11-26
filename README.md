@@ -25,8 +25,9 @@ Sessions logged: **0** / 90 (target ≥ 80)
 ## Daily loop
 
 ```
-ssh ip-10-0-132-247
-cd /home/mohd.nauman/kernel-engineering-lab && source env.sh   # note: ~ is /fsx2 on the GPU node
+srun -p dev --gres=gpu:1 --cpus-per-task=8 --time=02:00:00 --pty bash   # get your OWN GPU via SLURM
+cd /home/mohd.nauman/kernel-engineering-lab && source env.sh               # note: ~ is /fsx2 on GPU nodes
+nvidia-smi                                                                 # confirm the GPU is idle before benchmarking
 open NEXT.md → do the one task → run/measure → ./log.sh
 ```
 
