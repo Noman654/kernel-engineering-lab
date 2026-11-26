@@ -1,0 +1,2 @@
+timestamp,name,version,shape,dtype,layout,config,gpu,compute_capability,driver,cuda_runtime,torch,triton,nvcc,warmup,iters,l2_flush,median_us,p10_us,p90_us,stdev_us,correct,max_err,gbps,tflops,notes
+2026-11-26T13:37:43,vector_add,torch_baseline,16777216,fp32,contiguous,,NVIDIA H100 80GB HBM3,9.0,580.95.05,13.0,2.13.0+cu130,3.7.1,Build cuda_13.0.r13.0/compiler.36424714_0,10,100,True,73.39,72.26,73.86,3.25,True,0.000e+00,2743.2,,smoke test
