@@ -31,3 +31,7 @@ Read only what the current week in `PLAN.md` calls for.
 ## Frontier & AI-generated kernels
 - DeepGEMM, FlashMLA repositories
 - KernelBench paper + repository
+
+## Practice platform (optional warm-up)
+- TensorTonic — https://www.tensortonic.com/ (free tier is enough). Rule: max **1 problem, 10 min**, only on the **current week's topic**, or on Saturdays. It checks correctness, not speed — real measurement and profiling stay in this repo.
+  - Week 1: "GPU Occupancy Calculator". Weeks 9–11: attention / normalization problems.
