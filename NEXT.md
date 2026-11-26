@@ -2,8 +2,7 @@
 
 > Open this. Do it. No decisions.
 
-**Session 1 (Week 0, S1) — first action:**
-Run `nvidia-smi` and `nvcc --version`, and confirm the GPU is one you are approved to
-use. Paste the GPU model, driver, and CUDA version into the Session 1 worklog entry.
+**Session 2 — first action:**
+run cuobjdump -sass on kernels/week01/vector_add.cu; check if add_lane_div uses a branch (BRA) or predication (@P/SEL) - explains its 1.03x vs add_warp_div
 
-Then continue down Week 0 in [PLAN.md](PLAN.md). When done: `./log.sh`
+Plan reference: [PLAN.md](PLAN.md). When done: `./log.sh`

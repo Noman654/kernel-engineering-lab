@@ -7,7 +7,7 @@ the measured result.
 > *Depth over novelty, truth over ego, execution over appearance, long-term excellence
 > over short-term recognition.*
 
-Sessions logged: **0** / 90 (target ≥ 80)
+Sessions logged: **1** / 90 (target ≥ 80)
 
 ## How this repo works
 

@@ -19,3 +19,10 @@ Append-only. One entry per session, written by `./log.sh`. Benchmark details liv
 - Philosophy reading: pages ___ — one idea that applied this week:
 
 ---
+
+## Session 1 — 2026-11-26 (full)
+- **Did:** yes
+- **Result:** yes
+- **Evidence:** kernels/week01/vector_add.cu; PASS + sanitizer 0 errors; block 32/64/128 = 321/163/85 us (~0.62 ns per block); busy GPU gave impossible 4.5 TB/s
+- **Lesson:** check always gpu utilisation it can show the wrong result
+- **Next:** run cuobjdump -sass on kernels/week01/vector_add.cu; check if add_lane_div uses a branch (BRA) or predication (@P/SEL) - explains its 1.03x vs add_warp_div
