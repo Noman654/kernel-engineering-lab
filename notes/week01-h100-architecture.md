@@ -64,6 +64,21 @@ Example: n = 2²⁴, B = 256 → 65,536 blocks; 8 resident blocks/SM → 1,056 a
 - Divergence costs at **warp** level: lanes of one warp taking different branches serialize; whole warps taking different branches cost nothing extra.
 - I write code for one thread; hardware groups threads into warps, places blocks on SMs, and runs thousands concurrently.
 
+## Memory hierarchy (close/fast → far/slow)
+
+| Level | Where | Visible to | Controlled by | ~Latency |
+|---|---|---|---|---|
+| Registers | in SM | one thread | compiler (local vars) | ~1 cycle |
+| Shared memory | in SM (same SRAM as L1, 256 KB split) | one block | **me** (`__shared__`) | ~30 cycles |
+| L1 cache | in SM | that SM | hardware | ~30 cycles |
+| L2 cache (50 MB) | on chip | all SMs | hardware | ~200+ cycles |
+| HBM (80 GB, ~3.35 TB/s) | stacked DRAM beside the die | everyone | me (`cudaMalloc`) | ~500+ cycles |
+
+- **HBM** = High Bandwidth Memory: the GPU's main memory. Software name: **global memory**.
+- Lookup order for a load: L1 → L2 → HBM.
+- Core trick of kernel engineering: **load from HBM once, reuse many times from shared memory/registers.**
+- Vector add reuses nothing → HBM-bandwidth-bound → my baseline 2743 GB/s.
+
 ## Corrected misconceptions (Session 1 quiz)
 - **A block is never split across SMs.** It runs entirely on one SM — required for shared memory and `__syncthreads()`.
 - **One SM holds many blocks**, not the reverse: 2048 threads/SM → 8 blocks of 256, or 2 blocks of 1024 (thread limit; registers/shared memory can lower it).
